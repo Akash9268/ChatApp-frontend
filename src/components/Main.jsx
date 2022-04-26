@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Login from "./Login";
 import Chat from "./Chat";
 
@@ -31,7 +31,19 @@ function Main({ socket }) {
     setMessage("");
   };
 
+  const checkIfUserExists = useCallback(()=>{
+    const sessionId = localStorage.getItem("sessionId");
+    if(sessionId)
+    {
+      socket.auth = {sessionId:sessionId};
+      socket.connect();
+    }
+  },[socket]);
+
+
   useEffect(() => {
+    checkIfUserExists();
+
     socket.on("users", (users) => {
       const messagesArray = [];
       for (const { userId, username } of users) {
@@ -43,9 +55,11 @@ function Main({ socket }) {
       setUsers(users);
     });
 
-    socket.on("session", ({ userId, username }) =>
+    socket.on("session", ({ sessionId,userId, username }) =>{
+      socket.auth = {sessionId:sessionId};
+      localStorage.setItem("sessionId",sessionId);
       setUser({ userId, username })
-    );
+  });
 
     socket.on("user connected", ({ userId, username }) => {
       const newMessage = { type: "UserStatus", userId, username };
