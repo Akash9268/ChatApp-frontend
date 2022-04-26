@@ -16,10 +16,39 @@ code {
   height: 95vh !important;
 }
 
-.mt-500 {
-  margin-top: 530px;
-}
+/* .mt-500 {
+  margin-top: 480px;
+} */
 
 .mr-10 {
   margin-right: 10px;
+}
+
+.chat-height {
+  height: 75vh !important;
+}
+
+.chat-message-right {
+  display: flex;
+  flex-shrink: 0;
+  margin-right: auto;
+  flex-direction: row-reverse;
+}
+
+.chat-message-left {
+  display: flex;
+
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.chat-window {
+  z-index: 100;
+  height: 100%;
+  overflow: hidden;
+}
+
+.chat-input {
+  position: sticky;
+  bottom: 0;
 }
