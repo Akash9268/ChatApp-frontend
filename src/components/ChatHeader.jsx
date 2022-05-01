@@ -15,7 +15,7 @@ function ChatHeader({ user }) {
         </div>
 
         <div>
-          <strong>Logged in as {user}</strong>
+          <strong>{user}</strong>
         </div>
       </div>
     </div>

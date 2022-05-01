@@ -18,66 +18,38 @@ function Main({ socket }) {
     socket.connect();
   };
 
-  const sendMessage = () => {
-    socket.emit("new message", message);
-    const newMessage = {
-      type: "message",
-      userId: user.userId,
-      username: user.username,
-      message,
-    };
-
-    setMessages([...messages, newMessage]);
-    setMessage("");
-  };
-
-  const checkIfUserExists = useCallback(()=>{
+  //t
+  const checkIfUserExists = useCallback(() => {
     const sessionId = localStorage.getItem("sessionId");
-    if(sessionId)
-    {
-      socket.auth = {sessionId:sessionId};
+    if (sessionId) {
+      socket.auth = { sessionId: sessionId };
       socket.connect();
     }
-  },[socket]);
-
+  }, [socket]);
 
   useEffect(() => {
     checkIfUserExists();
 
-    socket.on("users", (users) => {
-      const messagesArray = [];
-      for (const { userId, username } of users) {
-        const newMessage = { type: "UserStatus", userId, username };
-        messagesArray.push(newMessage);
-      }
+    socket.on("connect", () => {
+      console.info("connected");
+    });
 
-      setMessages([...messages, ...messagesArray]);
+    socket.on("disconnect", () => {
+      console.info("disconnected");
+    });
+
+    socket.on("users", (users) => {
+      console.log(users);
       setUsers(users);
     });
 
-    socket.on("session", ({ sessionId,userId, username }) =>{
-      socket.auth = {sessionId:sessionId};
-      localStorage.setItem("sessionId",sessionId);
-      setUser({ userId, username })
-  });
-
-    socket.on("user connected", ({ userId, username }) => {
-      const newMessage = { type: "UserStatus", userId, username };
-      setMessages([...messages, newMessage]);
+    socket.on("session", ({ sessionId, userId, username }) => {
+      socket.auth = { sessionId: sessionId };
+      localStorage.setItem("sessionId", sessionId);
+      setUser({ userId, username });
     });
 
     console.log(messages);
-
-    socket.on("new message", ({ userId, username, message }) => {
-      const newMessage = {
-        type: "message",
-        userId: userId,
-        username: username,
-        message,
-      };
-
-      setMessages([...messages, newMessage]);
-    });
   }, [socket, messages]);
 
   return (
@@ -85,11 +57,12 @@ function Main({ socket }) {
       <div className="container mt-3">
         {user.userId && (
           <Chat
+            socket={socket}
             user={user}
-            setMessage={setMessage}
-            sendMessage={sendMessage}
-            message={message}
+            users={users}
+            setUsers={setUsers}
             messages={messages}
+            setMessages={setMessages}
           ></Chat>
         )}
 
