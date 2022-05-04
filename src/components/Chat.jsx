@@ -5,6 +5,8 @@ import ChatInput from "./ChatInput";
 import ScrollableFeed from "react-scrollable-feed";
 import { useState, useEffect, useRef } from "react";
 
+import { Encrypt, Decrypt } from "../utils/aes.js";
+
 function Chat({ socket, user, users, setUsers, messages, setMessages }) {
   const [message, setMessage] = useState("");
   const [selectedUser, setSelectedUser] = useState("");
@@ -76,7 +78,7 @@ function Chat({ socket, user, users, setUsers, messages, setMessages }) {
           const newMessage = {
             type: "message",
             userId: from,
-            message: content,
+            message: Decrypt(content),
           };
           setMessages([...messages, newMessage]);
         } else {
@@ -93,11 +95,12 @@ function Chat({ socket, user, users, setUsers, messages, setMessages }) {
   const userMessages = useCallback(
     ({ messages }) => {
       const chatMessages = [];
+      console.log({ messages_received: messages });
       if (messages.length >= 1) {
         messages.map((value, key) => {
           chatMessages.push({
             userId: value.from,
-            message: value.content,
+            message: Decrypt(value.content),
           });
 
           setMessages([...chatMessages]);
@@ -118,8 +121,9 @@ function Chat({ socket, user, users, setUsers, messages, setMessages }) {
   }, [socket, userConnected, userDisconnected, privateMessage, userMessages]);
 
   const sendMessage = () => {
+    const encrypted_message = Encrypt(message);
     socket.emit("private message", {
-      content: message,
+      content: encrypted_message,
       to: selectedUser.userId,
     });
 
@@ -129,6 +133,7 @@ function Chat({ socket, user, users, setUsers, messages, setMessages }) {
       message,
     };
 
+    console.log({ encrypted_message: encrypted_message });
     setMessages([...messages, newMessage]);
     setMessage("");
   };

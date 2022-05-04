@@ -6,7 +6,6 @@ function Main({ socket }) {
   const [newUser, setNewUser] = useState("");
   const [user, setUser] = useState({});
   const [users, setUsers] = useState([]);
-  const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const handleChange = (e) => {
     setNewUser(e.target.value);
@@ -48,8 +47,6 @@ function Main({ socket }) {
       localStorage.setItem("sessionId", sessionId);
       setUser({ userId, username });
     });
-
-    console.log(messages);
   }, [socket, messages]);
 
   return (
